@@ -3,7 +3,7 @@ name: Robot Tests  # Workflow name as it will appear in GitHub Actions
 # Triggers for the workflow
 on:
   schedule:
-    - cron: '0 3 * * 1-5'  # Runs at 3:00 AM UTC from Monday to Friday
+    - cron: '10 7 * * 1-5'  # Runs at 3:00 AM UTC from Monday to Friday
   push:
     branches: [main]       # Runs on push to the main branch
   pull_request:
@@ -52,8 +52,9 @@ jobs:
 
       # Step 6: Upload test results as GitHub Actions artifacts
       - name: Upload Robot results
-        uses: actions/upload-artifact@v4
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
-          name: robot-results          # Name of the artifact
-          path: output/                # Path to upload (contains log.html, report.html, screenshots, etc.)
+          name: robot-results
+          path: output/               # Path to upload (contains log.html, report.html, screenshots, etc.)
 
