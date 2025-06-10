@@ -53,7 +53,7 @@ jobs:
       # Step 6: Upload test results as GitHub Actions artifacts
       - name: Upload Robot results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: robot-results
           path: output/               # Path to upload (contains log.html, report.html, screenshots, etc.)
