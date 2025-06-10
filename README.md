@@ -12,14 +12,22 @@ This project demonstrates how to run **Robot Framework** end-to-end tests with *
 - 📸 Capture and store logs, reports, and screenshots
 
 ## 📁 Project Structure
-.
+
+```text
+robot-github-actions-demo/
 ├── .github/
-│ └── workflows/ # GitHub Actions workflow files
-├── resources/ # Shared Robot Framework keywords and variables
-├── tests/ # Robot Framework test cases
-├── output/ # Generated reports and screenshots
-├── Pipfile # Python dependencies
-└── Pipfile.lock
+│   └── workflows/
+│       └── ci.yml                # GitHub Actions CI workflow
+├── resources/                    # Shared Robot Framework keywords and variables
+│   ├── keywords.robot
+│   └── variables.robot
+├── tests/                        # Robot Framework test cases
+│   └── example_test.robot
+├── output/                       # Generated logs, reports, and screenshots
+├── Pipfile                       # Pipenv dependencies
+├── Pipfile.lock
+└── README.md
+```
 
 ## ⚙️ Key Technologies
 
