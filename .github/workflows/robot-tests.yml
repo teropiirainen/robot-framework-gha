@@ -3,7 +3,7 @@ name: Robot Tests  # Workflow name as it will appear in GitHub Actions
 # Triggers for the workflow
 on:
   schedule:
-    - cron: '10 7 * * 1-5'  # Runs at 3:30 AM UTC from Monday to Friday
+    - cron: '41 21 * * 1-5'  # Runs at 3:30 AM UTC from Monday to Friday
   push:
     branches: [main, dev]       # Trigger on push to main or dev branch
   pull_request:
@@ -12,6 +12,12 @@ on:
 jobs:
   test:  # Job name
     runs-on: ubuntu-latest  # Uses the latest available Ubuntu runner
+
+    env:
+      logLevel: "WARN"
+      includeTag: "sanity"
+      testDirectory: "tests/"
+      resultsDirectory: "output"
 
     steps:
       # Step 1: Check out the repository code
@@ -43,7 +49,7 @@ jobs:
       # Step 5: Run Robot Framework tests
       - name: Run Robot Framework tests
         run: |
-          pipenv run robot --outputdir output tests/  # Execute tests, save reports/screenshots in 'output/'
+          pipenv run robot --loglevel ${{ env.logLevel }} --include ${{ env.includeTag }} -d ${{ env.resultsDirectory }}  ${{ env.testDirectory }}  # Execute tests, save reports/screenshots in 'output/'
 
       # Step 6: Upload test results as GitHub Actions artifacts
       - name: Upload Robot results
