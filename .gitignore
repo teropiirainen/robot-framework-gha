@@ -1,3 +1,21 @@
+# Robot Framework output files
+output.xml
+log.html
+report.html
+*.log
+*.xml
+*.html
+
+# Robot Framework Debug Files
+debug.log
+*.png  # Screenshots (if generated on failure)
+*.jpg
+*.jpeg
+
+# Custom output directories (change based on your config)
+results/
+output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

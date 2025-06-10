@@ -1,0 +1,59 @@
+name: Robot Tests  # Workflow name as it will appear in GitHub Actions
+
+# Triggers for the workflow
+on:
+  schedule:
+    - cron: '0 3 * * 1-5'  # Runs at 3:00 AM UTC from Monday to Friday
+  push:
+    branches: [main]       # Runs on push to the main branch
+  pull_request:
+    branches: [main]       # Runs on pull requests targeting the main branch
+
+jobs:
+  test:  # Job name
+    runs-on: ubuntu-latest  # Uses the latest available Ubuntu runner
+
+    # Matrix strategy (allows easy parallelization by browser or config)
+    strategy:
+      matrix:
+        browser: [chrome]  # Currently using Chrome; extend as needed
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Install Google Chrome (required for Selenium browser automation)
+      - name: Install Google Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      # Step 3: Set up Python 3.11
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Step 4: Install Pipenv and project dependencies
+      - name: Install dependencies
+        run: |
+          pip install pipenv            # Install Pipenv package manager
+          pipenv install                # Install all dependencies from Pipfile
+
+      # Step 5: Run Robot Framework tests
+      - name: Run Robot Framework tests
+        run: |
+          pipenv run robot --outputdir output tests/  # Execute tests, save reports/screenshots in 'output/'
+
+      # Step 6: Upload test results as GitHub Actions artifacts
+      - name: Upload Robot results
+        uses: actions/upload-artifact@v3
+        with:
+          name: robot-results          # Name of the artifact
+          path: output/                # Path to upload (contains log.html, report.html, screenshots, etc.)
+
