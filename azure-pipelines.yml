@@ -3,5 +3,73 @@ resources:
   repositories:
     - repository: myrepo
       type: github
-      name: github.com/teropiirainen/robot-framework-gha
-      endpoint: GitHubServiceConnectionName
+      name: teropiirainen/robot-framework-gha
+      endpoint: github.com_teropiirainen
+
+trigger:
+  branches:
+    include:
+      - main
+      - dev
+
+schedules:
+- cron: "41 21 * * 1-5"   # Runs at 21:41 UTC Mon-Fri
+  displayName: "Nightly Robot Tests"
+  branches:
+    include:
+      - main
+      - dev
+  always: true
+
+# Manual trigger is always available in Azure DevOps UI
+
+stages:
+- stage: RobotTests
+  displayName: "Run Robot Framework Tests"
+  jobs:
+  - job: TestJob
+    displayName: "Execute Robot Tests"
+    pool:
+      vmImage: 'ubuntu-latest'   # Or use your self-hosted agent pool name
+    variables:
+      logLevel: "WARN"
+      includeTag: "sanity"
+      testDirectory: "tests/"
+      resultsDirectory: "output"
+    steps:
+    # Step 1: Checkout code
+    - checkout: self
+
+    # Step 2: Install Google Chrome
+    - script: |
+        sudo apt-get update
+        sudo apt-get install -y wget gnupg
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+      displayName: "Install Google Chrome"
+
+    # Step 3: Set up Python 3.11
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.11'
+
+    # Step 4: Install Pipenv and dependencies
+    - script: |
+        pip install pipenv
+        pipenv install
+      displayName: "Install dependencies"
+
+    # Step 5: Run Robot Framework tests
+    - script: |
+        pipenv run robot --loglevel $(logLevel) --include $(includeTag) -d $(resultsDirectory) $(testDirectory)
+      displayName: "Run Robot Framework tests"
+
+    # Step 6: Publish test results as artifacts
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(resultsDirectory)'
+        artifactName: 'robot-results'
+        publishLocation: 'Container'
+
