@@ -1,0 +1,7 @@
+
+resources:
+  repositories:
+    - repository: myrepo
+      type: github
+      name: github.com/teropiirainen/robot-framework-gha
+      endpoint: GitHubServiceConnectionName
